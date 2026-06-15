@@ -1,0 +1,9 @@
+Indicator_Short,N,Mean,Median,Std Dev,Min,Max
+Asthma Incidence,370,346.1,344.5,96.2,105.3,625.8
+Asthma Prevalence,370,14972.9,14779.6,1768.1,9707.0,19021.0
+COPD Incidence,370,565.0,535.8,201.3,223.6,1357.4
+COPD Prevalence,370,8777.1,8707.0,2046.6,4369.2,12628.3
+Diabetes Incidence,370,800.3,781.0,137.5,483.3,1492.3
+Diabetes Prevalence,370,11437.9,11430.8,1185.2,9113.9,16148.9
+Hypertension Incidence,370,1998.4,1977.6,329.1,1213.3,2978.0
+Hypertension Prevalence,370,25751.6,25837.2,1695.8,21222.7,30300.1

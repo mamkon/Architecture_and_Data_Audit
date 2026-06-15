@@ -1,0 +1,49 @@
+Indicator,Metric,Unit of measurement,Indicator result
+Bladder Cancer Surgery,50th Percentile,Days,27.0
+Bladder Cancer Surgery,90th Percentile,Days,66.0
+Bladder Cancer Surgery,Volume,Number of cases,5948.0
+Breast Cancer Surgery,50th Percentile,Days,21.0
+Breast Cancer Surgery,90th Percentile,Days,41.0
+Breast Cancer Surgery,Volume,Number of cases,6861.0
+CABG,50th Percentile,Days,7.0
+CABG,90th Percentile,Days,66.0
+CABG,Volume,Number of cases,3200.0
+Cataract Surgery,% Meeting Benchmark,Proportion,65.6249171988024
+Cataract Surgery,50th Percentile,Days,71.0
+Cataract Surgery,90th Percentile,Days,253.0
+Cataract Surgery,Volume,Number of cases,75482.0
+Colorectal Cancer Surgery,50th Percentile,Days,21.0
+Colorectal Cancer Surgery,90th Percentile,Days,43.0
+Colorectal Cancer Surgery,Volume,Number of cases,2642.0
+CT Scan,50th Percentile,Days,8.0
+CT Scan,90th Percentile,Days,113.0
+CT Scan,Volume,Number of cases,640112.0
+Hip Fracture Repair,% Meeting Benchmark,Proportion,84.27968090098545
+Hip Fracture Repair,50th Percentile,Hours,24.5666666666667
+Hip Fracture Repair,90th Percentile,Hours,56.9166666666667
+Hip Fracture Repair,Volume,Number of cases,6393.0
+Hip Fracture Repair/Emergency and Inpatient,% Meeting Benchmark,Proportion,76.5589118530295
+Hip Fracture Repair/Emergency and Inpatient,50th Percentile,Hours,30.8666666666667
+Hip Fracture Repair/Emergency and Inpatient,90th Percentile,Hours,65.4833333333333
+Hip Fracture Repair/Emergency and Inpatient,Volume,Number of cases,5661.0
+Hip Replacement,% Meeting Benchmark,Proportion,82.0060790273556
+Hip Replacement,50th Percentile,Days,83.0
+Hip Replacement,90th Percentile,Days,239.0
+Hip Replacement,Volume,Number of cases,11515.0
+Knee Replacement,% Meeting Benchmark,Proportion,79.2260803309024
+Knee Replacement,50th Percentile,Days,88.0
+Knee Replacement,90th Percentile,Days,271.0
+Knee Replacement,Volume,Number of cases,18374.0
+Lung Cancer Surgery,50th Percentile,Days,20.0
+Lung Cancer Surgery,90th Percentile,Days,47.0
+Lung Cancer Surgery,Volume,Number of cases,1692.0
+MRI Scan,50th Percentile,Days,46.0
+MRI Scan,90th Percentile,Days,179.0
+MRI Scan,Volume,Number of cases,427973.0
+Prostate Cancer Surgery,50th Percentile,Days,36.0
+Prostate Cancer Surgery,90th Percentile,Days,90.0
+Prostate Cancer Surgery,Volume,Number of cases,1230.0
+Radiation Therapy,% Meeting Benchmark,Proportion,97.73
+Radiation Therapy,50th Percentile,Days,11.2
+Radiation Therapy,90th Percentile,Days,18.2
+Radiation Therapy,Volume,Number of cases,20059.0
