@@ -120,3 +120,28 @@ for the full privacy and ethics audit.
 
 Full reference list with APA citations is in Chapter 2 (Milestone 2 Interim
 Report), section "References".
+
+
+---
+
+## Milestone 3 — Initial Results and Coding
+
+**Baseline Result:** Linear Regression — Test R² = 0.9740
+
+### New Folders Added
+| Folder | Contents |
+|---|---|
+| `/notebooks` | MamkonMO_CIND820_Initial_Results_and_Coding.ipynb |
+| `/outputs` | Compiled PDF of notebook |
+| `/docs` | Initial Results Report PDF |
+
+### How to Run Milestone 3
+1. Upload `PHO_Chronic_Disease_Inc_Prev_Snapshot_2014_2023.xlsx` to `/content/` in Google Colab
+2. Open `notebooks/MamkonMO_CIND820_Initial_Results_and_Coding.ipynb`
+3. Click Runtime → Run all
+4. No additional installations required
+
+### Milestones
+- Milestone 1: Project Design ✅
+- Milestone 2: Architecture and Data Audit ✅ (Grade: A+)
+- Milestone 3: Initial Results and Coding ✅
