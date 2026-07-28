@@ -145,3 +145,46 @@ Report), section "References".
 - Milestone 1: Project Design ✅
 - Milestone 2: Architecture and Data Audit ✅ (Grade: A+)
 - Milestone 3: Initial Results and Coding ✅
+- # Chronic Disease Burden and Healthcare Access Equity Across Ontario
+
+**Author:** Mamkon Mercy Oyeleke  
+**Institution:** Toronto Metropolitan University (CIND 820 - Big Data Analytics Project)  
+**Supervisor:** Dr. Ceni Babaoglu  
+
+---
+
+## 📌 Executive Summary
+This repository contains an end-to-end, object-oriented data pipeline and predictive machine learning architecture designed to forecast age-standardized chronic disease rates across Ontario’s 29 Public Health Units (PHUs). 
+
+By analyzing ten years of data (2014–2023) across conditions like Asthma, COPD, Diabetes, and Hypertension, this project transitions public health analysis from historical reporting to predictive resource allocation. Furthermore, it integrates Canadian Institute for Health Information (CIHI) wait times to expose critical intersections between regional disease burden and healthcare access inequity.
+
+## 🏗️ Data Architecture & Pipeline
+The project utilizes a custom, reproducible Python pipeline (`PHODataLoader` and `PHOAnalyticalLoader`) built to enterprise data governance standards:
+*   **Leakage Prevention:** Target-derived features (e.g., raw case counts, 95% CIs) are strictly excluded prior to modeling.
+*   **Target Transformation:** Applied `log1p(Rate)` to correct severe right-skewness (0.912 to -0.164) caused by scale-dominance between conditions.
+*   **Chronological Validation:** Implemented `TimeSeriesSplit` (2018-2023 expanding window) to simulate real-world operational forecasting and prevent future-data leakage during training.
+
+## 🤖 Champion Model: Linear Regression
+Three models were evaluated: Linear Regression, Random Forest, and Gradient Boosting. **Linear Regression** was selected as the champion model for its optimal balance of effectiveness, efficiency, and interpretability.
+
+*   **Test R²:** 0.9740
+*   **Test RMSE:** 0.2620
+*   **Training Time:** 0.0074s (33x to 45x faster than tree-based ensembles)
+*   **Stability:** Highly stable across chronological validation folds, proving robustness against structural breaks like the COVID-19 pandemic.
+
+## 📊 Key Actionable Insights
+1.  **Geography Dictates Health Risk:** Even after controlling for disease type, year, and population, PHU location independently predicts disease rates. Specifically, negative coefficients for Toronto (-0.616) and Ottawa (-0.355) confirm that geographic location acts as a standalone risk variable.
+2.  **The Access Equity Gap:** A statistically significant correlation (Spearman ρ = 0.83, p = 0.042) exists between high chronic disease burden and 90th-percentile specialist wait times, specifically flagging compounding vulnerabilities in Northern Ontario.
+3.  **The COVID-19 Care Deficit:** The 2020-2021 dip in recorded rates reflects a collapse in primary care access, not a public health success, establishing that these years should not be used as planning benchmarks.
+
+## 📂 Repository Structure
+*   `/data/` - Contains the PHO Chronic Disease Snapshot (2014–2023).
+*   `/notebooks/` - `MamkonMO_CIND820_Milestone4_FINAL.ipynb` (Full end-to-end pipeline).
+*   `/docs/` - `Oyeleke_Mercy_Mamkon_CIND820_Milestone4_FinalReport.docx` (Final Project Report, including GenAI Declaration).
+*   `/figures/` - Diagnostic plots, feature importance, and EDA visualizations.
+
+## 🚀 Reproducibility & Run Instructions
+To reproduce this analysis:
+1. Clone this repository to your local environment.
+2. Ensure the PHO Excel file is placed in the active `/data/` or `/content/` directory.
+3. Execute the Jupyter Notebook cells sequentially. No external dependencies outside of standard Python scientific libraries (`pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`) are required.
