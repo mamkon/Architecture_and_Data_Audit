@@ -1,0 +1,51 @@
+PHU Rate =
+IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactPHO[Rate]))
+// Format: #,0.0
+
+Median PHU Rate =
+IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), MEDIAN(FactPHO[Rate]))
+// Format: #,0.0
+
+Ontario Rate =
+IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactOntario[Rate]))
+// Format: #,0.0
+
+PHU Gap vs Ontario =
+VAR R = [PHU Rate] VAR B = [Ontario Rate] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)
+// Format: +#,0.0;-#,0.0;0.0
+
+PHU Count =
+DISTINCTCOUNT(FactPHO[Geography])
+// Format: 0
+
+Indicator Count =
+DISTINCTCOUNT(FactPHO[Indicator])
+// Format: 0
+
+Ontario Median Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[MedianDays]))
+// Format: 0.0
+
+Ontario P90 Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[P90Days]))
+// Format: 0.0
+
+Regional Median Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[MedianDays]))
+// Format: 0.0
+
+Regional P90 Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[P90Days]))
+// Format: 0.0
+
+Ontario Within Benchmark =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitProvince[BenchmarkPct]),100))
+// Format: 0.0%
+
+Regional Within Benchmark =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitRegion[BenchmarkPct]),100))
+// Format: 0.0%
+
+Regional Gap vs Ontario Days =
+VAR R = [Regional Median Wait Days] VAR B = [Ontario Median Wait Days] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)
+// Format: +0.0;-0.0;0.0

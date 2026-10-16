@@ -1,0 +1,188 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.0.0/schema.json",
+  "name": "Access_WaitTable",
+  "position": {
+    "x": 24,
+    "y": 555,
+    "z": 0,
+    "height": 265,
+    "width": 1392,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Region comparison \u00c2\u00b7 missing / mixed contexts remain blank'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#18334B'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#FFFFFF'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#DDE5EE'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "8"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DimWaitRegion"
+                    }
+                  },
+                  "Property": "Region"
+                }
+              },
+              "queryRef": "DimWaitRegion.Region",
+              "nativeQueryRef": "Region"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactPHO"
+                    }
+                  },
+                  "Property": "Regional Median Wait Days"
+                }
+              },
+              "queryRef": "FactPHO.Regional Median Wait Days",
+              "nativeQueryRef": "Regional Median Wait Days"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactPHO"
+                    }
+                  },
+                  "Property": "Regional P90 Wait Days"
+                }
+              },
+              "queryRef": "FactPHO.Regional P90 Wait Days",
+              "nativeQueryRef": "Regional P90 Wait Days"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactPHO"
+                    }
+                  },
+                  "Property": "Regional Within Benchmark"
+                }
+              },
+              "queryRef": "FactPHO.Regional Within Benchmark",
+              "nativeQueryRef": "Regional Within Benchmark"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FactPHO"
+                    }
+                  },
+                  "Property": "Regional Gap vs Ontario Days"
+                }
+              },
+              "queryRef": "FactPHO.Regional Gap vs Ontario Days",
+              "nativeQueryRef": "Regional Gap vs Ontario Days"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

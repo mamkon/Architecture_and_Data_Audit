@@ -1,0 +1,21 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert'),path=require('path');
+const root=path.resolve(__dirname,'..');
+const html=fs.readFileSync(path.join(root,'demo/index.html'),'utf8');
+const code=html.match(/<script>([\s\S]*?)<\/script>/)[1];
+const nodes={};
+function element(){let val='';return {children:[],hidden:false,innerHTML:'',textContent:'',dataset:{},handlers:{},classList:{toggle(){}},set value(v){val=String(v)},get value(){return val},replaceChildren(...c){this.children=c;this.value=c[0]?.value??''},addEventListener(k,f){this.handlers[k]=f}}}
+const node=id=>nodes[id]??=element();
+const buttons=['disease','regional','access'].map(page=>Object.assign(element(),{dataset:{page}}));
+const doc={documentElement:{style:{setProperty(){}}},getElementById:node,createElement:()=>element(),querySelectorAll:()=>buttons};
+vm.runInNewContext(code,{document:doc,console,URLSearchParams,Set,Array,String,Math});
+assert(node('title').textContent.includes('Disease Overview'));
+assert(node('cards').innerHTML.includes('29'));
+assert(node('chart').innerHTML.includes('<svg'));
+buttons[1].handlers.click();assert(node('table').innerHTML.includes('Demo PHU 01'));
+node('year').value='2020';node('year').handlers.change();assert(node('table').innerHTML.includes('Not available'));
+node('indicator').value='Incidence of COPD';node('indicator').handlers.change();assert(node('chart-title').textContent.includes('COPD'));
+buttons[2].handlers.click();assert(node('title').textContent.includes('2024'));assert(node('table').innerHTML.includes('Demo Health Region'));
+node('procedure').value='MRI Scan';node('procedure').handlers.change();assert(node('table').innerHTML.includes('Regional results are reported'));
+buttons[0].handlers.click();assert(node('title').textContent.includes('2023'));
+assert(!node('chart').innerHTML.includes('NaN'));
+console.log('PASS: synthetic demo initial state, three tabs, indicator/procedure/year filters, missing values and unavailable-region state.');

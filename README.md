@@ -1,190 +1,29 @@
-# Chronic Disease Burden and Healthcare Access Equity in Ontario
+# Ontario Analytics · Chronic Disease & Healthcare Access
 
-**CIND 820: Big Data Analytics Project**
-Mamkon Mercy Oyeleke | Student Number: 501279489 | Toronto Metropolitan University
+**Mamkon Mercy Oyeleke · Power BI, DAX, Power Query and Python**
 
-## Project Summary
+A professional analytics project exploring historical chronic disease patterns and healthcare access in Ontario, with a complete editable three-page Power BI report and a browser companion.
 
-This project investigates whether Ontario regions with the highest chronic
-disease burden also face the greatest gaps in access to timely healthcare.
-It combines two public datasets, chronic disease prevalence/incidence from
-Public Health Ontario and wait times for priority procedures from the
-Canadian Institute for Health Information, to identify regions where
-burden and access constraints compound each other, supporting evidence-based
-resource allocation by Ontario Health.
+**[Explore the interactive synthetic demo](https://mamkon.github.io/ontario-analytics/)** · **[Open the full Power BI project guide](powerbi/ontario-analytics/README.md)** · **[Visit my portfolio](https://mamkon.github.io/#ontario-powerbi)**
 
-**Research questions:**
-- **RQ1**: How do chronic disease prevalence/incidence rates vary across
-  Ontario regions?
-- **RQ2**: How have chronic disease-related hospitalizations and utilization
-  changed over 2014–2023?
-- **RQ3**: Do regions with the highest chronic disease burden also face the
-  longest wait times for priority procedures?
+![Ontario Analytics — Disease Overview synthetic demonstration](powerbi/ontario-analytics/previews/Preview-01-Disease.png)
 
-## Datasets
+## Power BI report
 
-| Dataset | Source | Licence | Access date |
-|---|---|---|---|
-| Chronic Disease Incidence and Prevalence Snapshot (2014–2023) | [Public Health Ontario](https://www.publichealthontario.ca/en/Data-and-Analysis/Chronic-Disease/Chronic-Disease-Incidence-Prevalence) | Open Government Licence, Ontario | May 2026 |
-| Wait Times for Priority Procedures in Canada, 2025 (2008–2024) | [CIHI](https://www.cihi.ca/en/wait-times-for-priority-procedures-in-canada-2025) | CIHI non-commercial/research use | Jun 2026 |
+| Report page | Focus |
+| --- | --- |
+| Disease Overview | Chronic disease trends and separate provincial reference rates |
+| PHU Comparisons | Indicator-specific PHU rankings and rate differences |
+| Healthcare Access | Procedure-specific waits, 90th percentiles and benchmark percentages |
 
-## Repository Structure
+The [project guide](powerbi/ontario-analytics/README.md) includes all three preview images, objectives, data sources, methodology, analytical techniques, folder structure, Desktop opening instructions and validation limits. The full editable report and semantic model are under `powerbi/ontario-analytics/`.
 
-```
-Architecture_and_Data_Audit/
-├── README.md
-├── LICENSE
-├── data/
-│   ├── raw/                          # original downloaded files
-│   └── processed/                    # cleaned/joined outputs
-├── notebooks/
-│   ├── 01_pho_eda.ipynb              # PHO profiling (Milestone 2)
-│   ├── 02_cihi_eda.ipynb             # CIHI profiling (Milestone 2)
-│   └── 03_pho_cihi_join_rq3.ipynb    # regional join + RQ3 preliminary test
-├── outputs/
-│   ├── figures/                      # 12 figures (fig1-fig12)
-│   └── tables/                       # summary stats, RQ3 join table
-├── reports/
-│   └── CIND820_Milestone2_Interim_Report.pdf   # generated EDA/interim report
-└── docs/
-    ├── privacy_and_ethics_check.md
-    ├── ai_use_declaration.md
-    └── pipeline_diagram.png
-```
+## Data and publication status
 
-## Generated EDA Report
+The new public previews and interactive companion use **synthetic demonstration values**, not PHO/CIHI observations. Real inputs, extracts, reports and original images remain in a complete private local archive pending suitable redistribution permission. See the [publication review](powerbi/ontario-analytics/docs/DATA-AND-PUBLICATION.md). The public demo is not a live API or a native Power BI export; Desktop rendering still needs verification.
 
-The full Milestone 2 Interim Report, including the methodological rationale,
-data profiling, RQ3 preliminary test, architecture diagrams, and reproducibility
-section, is available as a PDF at
-[`reports/CIND820_Milestone2_Interim_Report.pdf`](reports/CIND820_Milestone2_Interim_Report.pdf).
-It was generated from the analysis in `notebooks/01_pho_eda.ipynb`,
-`notebooks/02_cihi_eda.ipynb`, and `notebooks/03_pho_cihi_join_rq3.ipynb`.
+## Research background
 
-## How to Run
+Earlier exploratory notebooks, figures, reports and the local read-only source API remain in the repository as historical research material. Their methods, metrics and source periods are separate from this descriptive dashboard and its synthetic public demonstration. See [live_api/README.md](live_api/README.md) for the local API and browse the existing notebooks for earlier analysis.
 
-Each notebook can be opened directly in Google Colab. The first code cell in
-each notebook clones this repository when running in Colab, so the relative
-`../data/raw/` and `../outputs/` paths resolve correctly without any manual
-setup:
-
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mamkon/Architecture_and_Data_Audit/blob/main/notebooks/01_pho_eda.ipynb) `01_pho_eda.ipynb`
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mamkon/Architecture_and_Data_Audit/blob/main/notebooks/02_cihi_eda.ipynb) `02_cihi_eda.ipynb`
-- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mamkon/Architecture_and_Data_Audit/blob/main/notebooks/03_pho_cihi_join_rq3.ipynb) `03_pho_cihi_join_rq3.ipynb`
-
-Each notebook reads directly from `data/raw/` and is self-contained, but the
-logical order is 01, then 02, then 03.
-
-To run locally instead, from the `notebooks/` directory:
-
-```bash
-pip install pandas numpy matplotlib seaborn openpyxl jupyter
-jupyter notebook
-```
-
-## Status (Milestone 2)
-
-- ✅ PHO dataset fully profiled: 39,220 rows, 8 indicators, 37 geographies,
-  2014–2023. Suppression rate 0.018%. Composite burden score built for all
-  regions.
-- ✅ CIHI dataset fully profiled: 18,956 rows, 14 indicators, 11 provinces,
-  2008–2024. Ontario provincial trends and regional (Hip/Knee replacement)
-  breakdown completed.
-- ✅ **Key structural finding**: PHO's geography field includes 7 regional
-  rollups (Central East, Central West, East, North East, North West, South
-  West, Toronto) that map cleanly onto CIHI's 6 Ontario health regions
-  (Central East + Central West → Central; South West → West). This mapping
-  is the join key for RQ3.
-- ✅ RQ3 preliminary test complete: composite chronic disease burden score
-  vs. average Hip+Knee replacement wait time across Ontario's 6 regions,
-  r = 0.61 (n = 6). North East Region is highest on both burden (0.88) and
-  near-highest on wait time (142 days); Toronto Region is lowest on both
-  (0.31 burden, 48 days).
-- ⏳ Next (Milestone 3): extend the regional join across multiple years,
-  test statistical significance with a larger effective sample, and explore
-  whether the 28 individual PHU records can be approximately assigned to one
-  of the 6 CIHI regions for finer-grained analysis.
-
-## GenAI Declaration
-
-See [`docs/ai_use_declaration.md`](docs/ai_use_declaration.md) for the full
-AI use disclosure, including specific failure-mode mitigations applied this
-milestone.
-
-## Privacy and Ethics
-
-See [`docs/privacy_and_ethics_check.md`](docs/privacy_and_ethics_check.md)
-for the full privacy and ethics audit.
-
-## References
-
-Full reference list with APA citations is in Chapter 2 (Milestone 2 Interim
-Report), section "References".
-
-
----
-
-## Milestone 3 — Initial Results and Coding
-
-**Baseline Result:** Linear Regression — Test R² = 0.9740
-
-### New Folders Added
-| Folder | Contents |
-|---|---|
-| `/notebooks` | MamkonMO_CIND820_Initial_Results_and_Coding.ipynb |
-| `/outputs` | Compiled PDF of notebook |
-| `/docs` | Initial Results Report PDF |
-
-### How to Run Milestone 3
-1. Upload `PHO_Chronic_Disease_Inc_Prev_Snapshot_2014_2023.xlsx` to `/content/` in Google Colab
-2. Open `notebooks/MamkonMO_CIND820_Initial_Results_and_Coding.ipynb`
-3. Click Runtime → Run all
-4. No additional installations required
-
-### Milestones
-- Milestone 1: Project Design ✅
-- Milestone 2: Architecture and Data Audit ✅ (Grade: A+)
-- Milestone 3: Initial Results and Coding ✅
-- # Chronic Disease Burden and Healthcare Access Equity Across Ontario
-
-**Author:** Mamkon Mercy Oyeleke  
-**Institution:** Toronto Metropolitan University (CIND 820 - Big Data Analytics Project)  
-**Supervisor:** Dr. Ceni Babaoglu  
-
----
-
-## 📌 Executive Summary
-This repository contains an end-to-end, object-oriented data pipeline and predictive machine learning architecture designed to forecast age-standardized chronic disease rates across Ontario’s 29 Public Health Units (PHUs). 
-
-By analyzing ten years of data (2014–2023) across conditions like Asthma, COPD, Diabetes, and Hypertension, this project transitions public health analysis from historical reporting to predictive resource allocation. Furthermore, it integrates Canadian Institute for Health Information (CIHI) wait times to expose critical intersections between regional disease burden and healthcare access inequity.
-
-## 🏗️ Data Architecture & Pipeline
-The project utilizes a custom, reproducible Python pipeline (`PHODataLoader` and `PHOAnalyticalLoader`) built to enterprise data governance standards:
-*   **Leakage Prevention:** Target-derived features (e.g., raw case counts, 95% CIs) are strictly excluded prior to modeling.
-*   **Target Transformation:** Applied `log1p(Rate)` to correct severe right-skewness (0.912 to -0.164) caused by scale-dominance between conditions.
-*   **Chronological Validation:** Implemented `TimeSeriesSplit` (2018-2023 expanding window) to simulate real-world operational forecasting and prevent future-data leakage during training.
-
-## 🤖 Champion Model: Linear Regression
-Three models were evaluated: Linear Regression, Random Forest, and Gradient Boosting. **Linear Regression** was selected as the champion model for its optimal balance of effectiveness, efficiency, and interpretability.
-
-*   **Test R²:** 0.9740
-*   **Test RMSE:** 0.2620
-*   **Training Time:** 0.0074s (33x to 45x faster than tree-based ensembles)
-*   **Stability:** Highly stable across chronological validation folds, proving robustness against structural breaks like the COVID-19 pandemic.
-
-## 📊 Key Actionable Insights
-1.  **Geography Dictates Health Risk:** Even after controlling for disease type, year, and population, PHU location independently predicts disease rates. Specifically, negative coefficients for Toronto (-0.616) and Ottawa (-0.355) confirm that geographic location acts as a standalone risk variable.
-2.  **The Access Equity Gap:** A statistically significant correlation (Spearman ρ = 0.83, p = 0.042) exists between high chronic disease burden and 90th-percentile specialist wait times, specifically flagging compounding vulnerabilities in Northern Ontario.
-3.  **The COVID-19 Care Deficit:** The 2020-2021 dip in recorded rates reflects a collapse in primary care access, not a public health success, establishing that these years should not be used as planning benchmarks.
-
-## 📂 Repository Structure
-*   `/data/` - Contains the PHO Chronic Disease Snapshot (2014–2023).
-*   `/notebooks/` - `MamkonMO_CIND820_Milestone4_FINAL.ipynb` (Full end-to-end pipeline).
-*   `/docs/` - `Oyeleke_Mercy_Mamkon_CIND820_Milestone4_FinalReport.docx` (Final Project Report, including GenAI Declaration).
-*   `/figures/` - Diagnostic plots, feature importance, and EDA visualizations.
-
-## 🚀 Reproducibility & Run Instructions
-To reproduce this analysis:
-1. Clone this repository to your local environment.
-2. Ensure the PHO Excel file is placed in the active `/data/` or `/content/` directory.
-3. Execute the Jupyter Notebook cells sequentially. No external dependencies outside of standard Python scientific libraries (`pandas`, `numpy`, `matplotlib`, `seaborn`, `scikit-learn`) are required.
+This presentation update does not rewrite Git history or review every older document for sensitive metadata. The public-copy review applies to the newly added Power BI folder and portfolio additions. Publisher data and trademarks are not relicensed by the repository's software licence.

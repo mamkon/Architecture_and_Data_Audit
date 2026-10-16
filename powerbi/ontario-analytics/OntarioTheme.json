@@ -1,0 +1,14 @@
+{
+  "name": "PHO & CIHI source colours",
+  "dataColors": [
+    "#693A77",
+    "#0F80A7",
+    "#008184",
+    "#00A199",
+    "#ED7024",
+    "#29585F"
+  ],
+  "background": "#F3F6F8",
+  "foreground": "#2E3133",
+  "tableAccent": "#693A77"
+}

@@ -1,0 +1,606 @@
+{
+  "name": "OntarioAnalytics",
+  "compatibilityLevel": 1601,
+  "model": {
+    "culture": "en-US",
+    "defaultPowerBIDataSourceVersion": "powerBI_V3",
+    "expressions": [
+      {
+        "name": "SourceFolder",
+        "kind": "m",
+        "expression": "\"C:\\PowerBI\\Ontario\\input\\\" meta [IsParameterQuery=true, Type=\"Text\", IsParameterQueryRequired=true]"
+      },
+      {
+        "name": "SourcePHO",
+        "kind": "m",
+        "expression": [
+          "let",
+          "    W = Excel.Workbook(File.Contents(SourceFolder & \"PHO_Chronic_Disease_Inc_Prev_Snapshot_2014_2023.xlsx\"), null, true),",
+          "    S = W{[Item=\"Chron Dis Inc Prev Data\",Kind=\"Sheet\"]}[Data],",
+          "    H = Table.PromoteHeaders(Table.Skip(S,2),[PromoteAllScalars=true]),",
+          "    R = Table.RenameColumns(H,{{Table.ColumnNames(H){9},\"SuppressionFlag\"},{\"95% Confidence Interval\",\"ConfidenceInterval\"}}),",
+          "    C = Table.TransformColumns(R,{{\"Geography\",Text.Trim,type text},{\"Indicator\",Text.Trim,type text},{\"Year\",each Int64.From(_),Int64.Type},{\"Rate\",each try Number.From(_) otherwise null,type nullable number},{\"SuppressionFlag\",each if _ = null then \"\" else Text.Trim(Text.From(_)),type text}}),",
+          "    V = Table.AddColumn(C,\"ValidRate\",each if [SuppressionFlag] = \"\" then [Rate] else null,type nullable number),",
+          "    D = Table.RemoveColumns(V,{\"Rate\"}),",
+          "    F = Table.RenameColumns(D,{{\"ValidRate\",\"Rate\"}})",
+          "in F"
+        ]
+      },
+      {
+        "name": "SourceCIHI",
+        "kind": "m",
+        "expression": [
+          "let",
+          "    W = Excel.Workbook(File.Contents(SourceFolder & \"CIHI_Wait_Times_Priority_Procedures_2025.xlsx\"),null,true),",
+          "    S = W{[Item=\"Table 1\",Kind=\"Sheet\"]}[Data],",
+          "    H = Table.PromoteHeaders(Table.Skip(S,1),[PromoteAllScalars=true]),",
+          "    C = Table.SelectColumns(H,{\"Reporting level\",\"Province\",\"Region\",\"Indicator\",\"Metric\",\"Data year\",\"Unit of measurement\",\"Indicator result\"}),",
+          "    O = Table.SelectRows(C,each [Province]=\"Ontario\"),",
+          "    R = Table.RenameColumns(O,{{\"Reporting level\",\"ReportingLevel\"},{\"Indicator\",\"Procedure\"},{\"Data year\",\"ReportingPeriod\"},{\"Unit of measurement\",\"Unit\"},{\"Indicator result\",\"ValueRaw\"}}),",
+          "    T = Table.TransformColumns(R,{{\"ReportingPeriod\",each Text.From(_),type text},{\"Metric\",each Text.Lower(Text.Trim(_)),type text},{\"Region\",each if _=\"n/a\" then \"Ontario\" else Text.Trim(_),type text}}),",
+          "    Y = Table.AddColumn(T,\"Year\",each Int64.From(Text.Start([ReportingPeriod],4)),Int64.Type),",
+          "    P = Table.AddColumn(Y,\"PeriodType\",each if Text.EndsWith([ReportingPeriod],\"FY\") then \"Fiscal year\" else if Text.EndsWith([ReportingPeriod],\"Q3Q4\") then \"October–March\" else \"April–September\",type text),",
+          "    V = Table.AddColumn(P,\"Value\",each try Number.From([ValueRaw]) otherwise null,type nullable number)",
+          "in V"
+        ]
+      },
+      {
+        "name": "CIHIWide",
+        "kind": "m",
+        "expression": [
+          "let",
+          "    S = Table.SelectRows(SourceCIHI,each [PeriodType]=\"April–September\"),",
+          "    M = Table.AddColumn(S,\"MetricKey\",each if [Metric]=\"50th percentile\" then \"MedianDays\" else if [Metric]=\"90th percentile\" then \"P90Days\" else if [Metric]=\"% meeting benchmark\" then \"BenchmarkPct\" else if [Metric]=\"volume\" then \"Volume\" else error \"Unexpected CIHI metric\",type text),",
+          "    C = Table.SelectColumns(M,{\"ReportingLevel\",\"Region\",\"Procedure\",\"Year\",\"MetricKey\",\"Value\"}),",
+          "    P = Table.Pivot(C,{\"MedianDays\",\"P90Days\",\"BenchmarkPct\",\"Volume\"},\"MetricKey\",\"Value\")",
+          "in P"
+        ]
+      }
+    ],
+    "tables": [
+      {
+        "name": "FactPHO",
+        "columns": [
+          {
+            "name": "Indicator",
+            "dataType": "string",
+            "sourceColumn": "Indicator",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Geography",
+            "dataType": "string",
+            "sourceColumn": "Geography",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Rate",
+            "dataType": "double",
+            "sourceColumn": "Rate",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ConfidenceInterval",
+            "dataType": "string",
+            "sourceColumn": "ConfidenceInterval",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "SuppressionFlag",
+            "dataType": "string",
+            "sourceColumn": "SuppressionFlag",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactPHO",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let S = Table.SelectRows(SourcePHO,each [Measure]=\"Age-standardized rate (both sexes)\" and not List.Contains({\"Central East\",\"Central West\",\"East\",\"North East\",\"North West\",\"South West\",\"Toronto\",\"Ontario\"},[Geography])), R = Table.SelectColumns(S,{\"Indicator\",\"Year\",\"Geography\",\"Rate\",\"ConfidenceInterval\",\"SuppressionFlag\"}) in R"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "PHU Rate",
+            "expression": "IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactPHO[Rate]))",
+            "formatString": "#,0.0",
+            "displayFolder": "Disease"
+          },
+          {
+            "name": "Median PHU Rate",
+            "expression": "IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), MEDIAN(FactPHO[Rate]))",
+            "formatString": "#,0.0",
+            "displayFolder": "Disease"
+          },
+          {
+            "name": "Ontario Rate",
+            "expression": "IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactOntario[Rate]))",
+            "formatString": "#,0.0",
+            "displayFolder": "Disease"
+          },
+          {
+            "name": "PHU Gap vs Ontario",
+            "expression": "VAR R = [PHU Rate] VAR B = [Ontario Rate] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)",
+            "formatString": "+#,0.0;-#,0.0;0.0",
+            "displayFolder": "Disease"
+          },
+          {
+            "name": "PHU Count",
+            "expression": "DISTINCTCOUNT(FactPHO[Geography])",
+            "formatString": "0",
+            "displayFolder": "Disease"
+          },
+          {
+            "name": "Indicator Count",
+            "expression": "DISTINCTCOUNT(FactPHO[Indicator])",
+            "formatString": "0",
+            "displayFolder": "Disease"
+          },
+          {
+            "name": "Ontario Median Wait Days",
+            "expression": "IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[MedianDays]))",
+            "formatString": "0.0",
+            "displayFolder": "Healthcare access"
+          },
+          {
+            "name": "Ontario P90 Wait Days",
+            "expression": "IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[P90Days]))",
+            "formatString": "0.0",
+            "displayFolder": "Healthcare access"
+          },
+          {
+            "name": "Regional Median Wait Days",
+            "expression": "IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[MedianDays]))",
+            "formatString": "0.0",
+            "displayFolder": "Healthcare access"
+          },
+          {
+            "name": "Regional P90 Wait Days",
+            "expression": "IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[P90Days]))",
+            "formatString": "0.0",
+            "displayFolder": "Healthcare access"
+          },
+          {
+            "name": "Ontario Within Benchmark",
+            "expression": "IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitProvince[BenchmarkPct]),100))",
+            "formatString": "0.0%",
+            "displayFolder": "Healthcare access"
+          },
+          {
+            "name": "Regional Within Benchmark",
+            "expression": "IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitRegion[BenchmarkPct]),100))",
+            "formatString": "0.0%",
+            "displayFolder": "Healthcare access"
+          },
+          {
+            "name": "Regional Gap vs Ontario Days",
+            "expression": "VAR R = [Regional Median Wait Days] VAR B = [Ontario Median Wait Days] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)",
+            "formatString": "+0.0;-0.0;0.0",
+            "displayFolder": "Healthcare access"
+          }
+        ]
+      },
+      {
+        "name": "FactOntario",
+        "columns": [
+          {
+            "name": "Indicator",
+            "dataType": "string",
+            "sourceColumn": "Indicator",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Rate",
+            "dataType": "double",
+            "sourceColumn": "Rate",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "ConfidenceInterval",
+            "dataType": "string",
+            "sourceColumn": "ConfidenceInterval",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "SuppressionFlag",
+            "dataType": "string",
+            "sourceColumn": "SuppressionFlag",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactOntario",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let S = Table.SelectRows(SourcePHO,each [Measure]=\"Age-standardized rate (both sexes)\" and [Geography]=\"Ontario\"), R = Table.SelectColumns(S,{\"Indicator\",\"Year\",\"Rate\",\"ConfidenceInterval\",\"SuppressionFlag\"}) in R"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimIndicator",
+        "columns": [
+          {
+            "name": "Indicator",
+            "dataType": "string",
+            "sourceColumn": "Indicator",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Disease",
+            "dataType": "string",
+            "sourceColumn": "Disease",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Statistic",
+            "dataType": "string",
+            "sourceColumn": "Statistic",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimIndicator",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let S = Table.Distinct(Table.SelectColumns(FactPHO,{\"Indicator\"})), D = Table.AddColumn(S,\"Disease\",each if Text.Contains([Indicator],\"asthma\") then \"Asthma\" else if Text.Contains([Indicator],\"COPD\") then \"COPD\" else if Text.Contains([Indicator],\"diabetes\") then \"Diabetes\" else if Text.Contains([Indicator],\"hypertension\") then \"Hypertension\" else error \"Unknown indicator\",type text), T = Table.AddColumn(D,\"Statistic\",each if Text.StartsWith([Indicator],\"Prevalence\") then \"Prevalence\" else \"Incidence\",type text) in T"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimPHU",
+        "columns": [
+          {
+            "name": "Geography",
+            "dataType": "string",
+            "sourceColumn": "Geography",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimPHU",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "Table.Distinct(Table.SelectColumns(FactPHO,{\"Geography\"}))"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimYear",
+        "columns": [
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimYear",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let Y = List.Combine({FactPHO[Year],FactWaitProvince[Year],FactWaitRegion[Year]}), T = Table.FromList(List.Numbers(List.Min(Y),List.Max(Y)-List.Min(Y)+1),Splitter.SplitByNothing(),{\"Year\"}), R = Table.TransformColumnTypes(T,{{\"Year\",Int64.Type}}) in R"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "FactWaitProvince",
+        "columns": [
+          {
+            "name": "Region",
+            "dataType": "string",
+            "sourceColumn": "Region",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Procedure",
+            "dataType": "string",
+            "sourceColumn": "Procedure",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MedianDays",
+            "dataType": "double",
+            "sourceColumn": "MedianDays",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "P90Days",
+            "dataType": "double",
+            "sourceColumn": "P90Days",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "BenchmarkPct",
+            "dataType": "double",
+            "sourceColumn": "BenchmarkPct",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Volume",
+            "dataType": "int64",
+            "sourceColumn": "Volume",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactWaitProvince",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "Table.RemoveColumns(Table.SelectRows(CIHIWide,each [ReportingLevel]=\"Provincial\"),{\"ReportingLevel\"})"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "FactWaitRegion",
+        "columns": [
+          {
+            "name": "Region",
+            "dataType": "string",
+            "sourceColumn": "Region",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Procedure",
+            "dataType": "string",
+            "sourceColumn": "Procedure",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "MedianDays",
+            "dataType": "double",
+            "sourceColumn": "MedianDays",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "P90Days",
+            "dataType": "double",
+            "sourceColumn": "P90Days",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "BenchmarkPct",
+            "dataType": "double",
+            "sourceColumn": "BenchmarkPct",
+            "summarizeBy": "none"
+          },
+          {
+            "name": "Volume",
+            "dataType": "int64",
+            "sourceColumn": "Volume",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "FactWaitRegion",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "Table.RemoveColumns(Table.SelectRows(CIHIWide,each [ReportingLevel]=\"Regional\"),{\"ReportingLevel\"})"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimProcedure",
+        "columns": [
+          {
+            "name": "Procedure",
+            "dataType": "string",
+            "sourceColumn": "Procedure",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimProcedure",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "Table.Distinct(Table.SelectColumns(FactWaitProvince,{\"Procedure\"}))"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "DimWaitRegion",
+        "columns": [
+          {
+            "name": "Region",
+            "dataType": "string",
+            "sourceColumn": "Region",
+            "summarizeBy": "none"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "DimWaitRegion",
+            "mode": "import",
+            "source": {
+              "type": "m",
+              "expression": [
+                "Table.Distinct(Table.SelectColumns(FactWaitRegion,{\"Region\"}))"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "24e2857b-bc2f-50b8-959b-747d6aa7e716",
+        "fromTable": "FactPHO",
+        "fromColumn": "Geography",
+        "toTable": "DimPHU",
+        "toColumn": "Geography",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "975909ad-a069-58f3-8577-f3c00d55ecda",
+        "fromTable": "FactPHO",
+        "fromColumn": "Indicator",
+        "toTable": "DimIndicator",
+        "toColumn": "Indicator",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "3b9c2ce5-c1a2-5077-9fbe-bc37f7b00a47",
+        "fromTable": "FactOntario",
+        "fromColumn": "Indicator",
+        "toTable": "DimIndicator",
+        "toColumn": "Indicator",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "09d0de59-961d-577a-804b-95ea18769113",
+        "fromTable": "FactWaitProvince",
+        "fromColumn": "Procedure",
+        "toTable": "DimProcedure",
+        "toColumn": "Procedure",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "5fe5f612-f52b-54c7-9e0d-697142567a8e",
+        "fromTable": "FactWaitRegion",
+        "fromColumn": "Procedure",
+        "toTable": "DimProcedure",
+        "toColumn": "Procedure",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "81c2e0ba-53ae-5ba5-bbe5-c17022aa3d8b",
+        "fromTable": "FactWaitRegion",
+        "fromColumn": "Region",
+        "toTable": "DimWaitRegion",
+        "toColumn": "Region",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "a66e4ba6-ba7d-565f-a467-e2790f6b9481",
+        "fromTable": "FactPHO",
+        "fromColumn": "Year",
+        "toTable": "DimYear",
+        "toColumn": "Year",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "7a808873-3773-570e-a584-b7f1911e7319",
+        "fromTable": "FactOntario",
+        "fromColumn": "Year",
+        "toTable": "DimYear",
+        "toColumn": "Year",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "54734eaf-afdc-595d-9067-2009a377485c",
+        "fromTable": "FactWaitProvince",
+        "fromColumn": "Year",
+        "toTable": "DimYear",
+        "toColumn": "Year",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      },
+      {
+        "name": "f3a7cb55-6865-52a6-84de-58a5ccfe1a28",
+        "fromTable": "FactWaitRegion",
+        "fromColumn": "Year",
+        "toTable": "DimYear",
+        "toColumn": "Year",
+        "crossFilteringBehavior": "oneDirection",
+        "fromCardinality": "many",
+        "toCardinality": "one",
+        "isActive": true
+      }
+    ],
+    "annotations": [
+      {
+        "name": "PBI_QueryOrder",
+        "value": "[\"DataFolder\", \"FactPHO\", \"FactOntario\", \"DimIndicator\", \"DimPHU\", \"DimYear\", \"FactWaitProvince\", \"FactWaitRegion\", \"DimProcedure\", \"DimWaitRegion\"]"
+      }
+    ]
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "colours": {
+    "PHO Purple": "#693A77",
+    "PHO Blue": "#0F80A7",
+    "PHO Teal": "#008184",
+    "CIHI Teal": "#00A199",
+    "CIHI Dark Teal": "#29585F",
+    "CIHI Orange": "#ED7024",
+    "Neutral Text": "#2E3133"
+  },
+  "sources": {
+    "PHO": "https://www.publichealthontario.ca/Resources/css/pho.min.css",
+    "CIHI styles": "https://www.cihi.ca/themes/custom/cihi_bootstrap/dist/css/theme.global.min.css",
+    "CIHI logo": "https://www.cihi.ca/themes/custom/cihi_bootstrap/img/cihi-logo-full-name_en.svg"
+  },
+  "note": "Values observed in official publisher materials, not a claimed comprehensive brand guideline. Independent portfolio research; no publisher endorsement."
+}
