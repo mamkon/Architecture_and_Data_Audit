@@ -1,0 +1,13 @@
+table DimPHU
+	lineageTag: 1a01ed22-00b6-4a44-9d00-42bf47e33476
+
+	column Geography
+		dataType: string
+		lineageTag: a4db1dd5-cebd-4e11-92fb-f6bda41fb27b
+		summarizeBy: none
+		sourceColumn: Geography
+
+	partition DimPHU = m
+		mode: import
+		source = Table.Distinct(Table.SelectColumns(FactPHO,{"Geography"}))
+

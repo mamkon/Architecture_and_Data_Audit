@@ -1,0 +1,35 @@
+{
+  "original_files": [
+    {
+      "name": "PHO_Chronic_Disease_Inc_Prev_Snapshot_2014_2023.xlsx",
+      "sha256": "c677ed6ffb4de55282d2e15a3b67bf778937b489ece671736bb90ff91895a110"
+    },
+    {
+      "name": "CIHI_Wait_Times_Priority_Procedures_2025.xlsx",
+      "sha256": "037e1bf1e5005acd9ea87008edc28ee5cbda37585f9f4fdcfcddcbebbe14b3d3"
+    }
+  ],
+  "raw_pho_rows": 39220,
+  "modeled_phu_rows": 2320,
+  "phus": 29,
+  "indicators": 8,
+  "ontario_cihi_rows": 1748,
+  "model_rows": {
+    "FactPHO": 2320,
+    "FactOntario": 80,
+    "DimIndicator": 8,
+    "DimPHU": 29,
+    "DimYear": 17,
+    "FactWaitProvince": 238,
+    "FactWaitRegion": 132,
+    "DimProcedure": 14,
+    "DimWaitRegion": 6
+  },
+  "checks": {
+    "unique_fact_grains": true,
+    "no_phu_rollups_in_phu_fact": true,
+    "no_suppression_in_phu_age_standardized_slice": true,
+    "cihi_report_periods": "April–September only",
+    "relationship": "No PHO / CIHI geographic join"
+  }
+}

@@ -1,0 +1,40 @@
+relationship 24e2857b-bc2f-50b8-959b-747d6aa7e716
+	fromColumn: FactPHO.Geography
+	toColumn: DimPHU.Geography
+
+relationship 975909ad-a069-58f3-8577-f3c00d55ecda
+	fromColumn: FactPHO.Indicator
+	toColumn: DimIndicator.Indicator
+
+relationship 3b9c2ce5-c1a2-5077-9fbe-bc37f7b00a47
+	fromColumn: FactOntario.Indicator
+	toColumn: DimIndicator.Indicator
+
+relationship 09d0de59-961d-577a-804b-95ea18769113
+	fromColumn: FactWaitProvince.Procedure
+	toColumn: DimProcedure.Procedure
+
+relationship 5fe5f612-f52b-54c7-9e0d-697142567a8e
+	fromColumn: FactWaitRegion.Procedure
+	toColumn: DimProcedure.Procedure
+
+relationship 81c2e0ba-53ae-5ba5-bbe5-c17022aa3d8b
+	fromColumn: FactWaitRegion.Region
+	toColumn: DimWaitRegion.Region
+
+relationship a66e4ba6-ba7d-565f-a467-e2790f6b9481
+	fromColumn: FactPHO.Year
+	toColumn: DimYear.Year
+
+relationship 7a808873-3773-570e-a584-b7f1911e7319
+	fromColumn: FactOntario.Year
+	toColumn: DimYear.Year
+
+relationship 54734eaf-afdc-595d-9067-2009a377485c
+	fromColumn: FactWaitProvince.Year
+	toColumn: DimYear.Year
+
+relationship f3a7cb55-6865-52a6-84de-58a5ccfe1a28
+	fromColumn: FactWaitRegion.Year
+	toColumn: DimYear.Year
+

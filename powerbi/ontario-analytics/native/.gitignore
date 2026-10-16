@@ -1,0 +1,8 @@
+**/.pbi/
+input/*
+!input/README.md
+data/
+*.pbix
+*.xlsx
+*.csv
+*.abf

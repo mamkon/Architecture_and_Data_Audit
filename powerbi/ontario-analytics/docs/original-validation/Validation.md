@@ -1,0 +1,1 @@
+Automated version: original source-grain and dimension checks retained; native model now reads Excel directly. Native M/DAX execution remains unverified. See START-HERE.md for tested local automation and service-refresh limits.

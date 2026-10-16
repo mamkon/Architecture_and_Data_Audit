@@ -1,0 +1,55 @@
+table FactWaitProvince
+	lineageTag: b8c03008-7be6-44d5-9cfc-95f73a625fe3
+
+	column Region
+		dataType: string
+		lineageTag: a6258b47-e38e-4384-aaac-3c5cacca6b40
+		summarizeBy: none
+		sourceColumn: Region
+
+	column Procedure
+		dataType: string
+		lineageTag: e6e4800f-154c-4078-981e-743adc802e48
+		summarizeBy: none
+		sourceColumn: Procedure
+
+	column Year
+		dataType: int64
+		lineageTag: 678e9e02-1dc3-4db9-af1c-cbf56cae5b6b
+		summarizeBy: none
+		sourceColumn: Year
+
+	column MedianDays
+		dataType: double
+		lineageTag: c2e87572-78e7-42d8-ad50-424a266f76b5
+		summarizeBy: none
+		sourceColumn: MedianDays
+
+	column P90Days
+		dataType: double
+		lineageTag: 98165285-22fb-44e3-998d-00b92f6ef8b0
+		summarizeBy: none
+		sourceColumn: P90Days
+
+	column BenchmarkPct
+		dataType: double
+		lineageTag: 110b261c-e8f2-4a3e-8465-256e8f1fc63b
+		summarizeBy: none
+		sourceColumn: BenchmarkPct
+
+	column Volume
+		dataType: double
+		lineageTag: e9c48abb-4893-40bc-b25d-8a29e37a477e
+		summarizeBy: sum
+		sourceColumn: Volume
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition FactWaitProvince = m
+		mode: import
+		source = Table.RemoveColumns(Table.SelectRows(CIHIWide,each [ReportingLevel]="Provincial"),{"ReportingLevel"})
+
+	annotation PBI_ResultType = Table
+

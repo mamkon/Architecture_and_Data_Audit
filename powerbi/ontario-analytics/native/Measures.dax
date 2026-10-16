@@ -1,0 +1,131 @@
+PHU Rate =
+IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactPHO[Rate]))
+
+Median PHU Rate =
+IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), MEDIAN(FactPHO[Rate]))
+
+Ontario Rate =
+IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactOntario[Rate]))
+
+PHU Gap vs Ontario =
+VAR R = [PHU Rate] VAR B = [Ontario Rate] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)
+
+PHU Count =
+DISTINCTCOUNT(FactPHO[Geography])
+
+Indicator Count =
+DISTINCTCOUNT(FactPHO[Indicator])
+
+Ontario Median Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[MedianDays]))
+
+Ontario P90 Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[P90Days]))
+
+Regional Median Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[MedianDays]))
+
+Regional P90 Wait Days =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[P90Days]))
+
+Ontario Within Benchmark =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitProvince[BenchmarkPct]),100))
+
+Regional Within Benchmark =
+IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitRegion[BenchmarkPct]),100))
+
+Regional Gap vs Ontario Days =
+VAR R = [Regional Median Wait Days] VAR B = [Ontario Median Wait Days] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)
+
+Selected PHO Year =
+SELECTEDVALUE(SelectPHOYear[Year], CALCULATE(MAX(FactPHO[Year]), REMOVEFILTERS()))
+
+Selected CIHI Year =
+SELECTEDVALUE(SelectCIHIYear[Year], CALCULATE(MAX(FactWaitProvince[Year]), REMOVEFILTERS()))
+
+Selected Indicator =
+SELECTEDVALUE(DimIndicator[Indicator], "Prevalence of asthma")
+
+Selected Procedure =
+SELECTEDVALUE(DimProcedure[Procedure], "Hip Replacement")
+
+Report Ontario Rate =
+CALCULATE([Ontario Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+
+Report Median PHU Rate =
+CALCULATE([Median PHU Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+
+Report PHU Rate =
+CALCULATE([PHU Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+
+Report PHU Gap =
+CALCULATE([PHU Gap vs Ontario], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+
+Report PHU Count =
+CALCULATE([PHU Count], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+
+Trend Ontario Rate =
+CALCULATE([Ontario Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]))
+
+Trend PHU Median =
+CALCULATE([Median PHU Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]))
+
+Ontario Rate 2014 =
+CALCULATE([Ontario Rate], TREATAS({[Selected Indicator]},DimIndicator[Indicator]), REMOVEFILTERS(DimYear), DimYear[Year]=2014)
+
+Rate Change Since 2014 =
+VAR A=[Ontario Rate 2014] VAR B=[Report Ontario Rate] RETURN IF(NOT ISBLANK(A) && NOT ISBLANK(B), DIVIDE(B-A,A))
+
+PHU Reference Rate =
+[Report Ontario Rate]
+
+PHU Rank =
+IF(NOT ISBLANK([Report PHU Rate]), RANKX(ALLSELECTED(DimPHU[Geography]), [Report PHU Rate],, DESC,Dense))
+
+PHUs Above Reference =
+VAR Ref=[Report Ontario Rate] RETURN IF(NOT ISBLANK(Ref), COUNTROWS(FILTER(ALLSELECTED(DimPHU[Geography]),NOT ISBLANK([Report PHU Rate]) && [Report PHU Rate]>Ref)))
+
+PHU Rate CI =
+CALCULATE(SELECTEDVALUE(FactPHO[ConfidenceInterval]), TREATAS({[Selected Indicator]},DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+
+Report Median Wait =
+CALCULATE([Ontario Median Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Report P90 Wait =
+CALCULATE([Ontario P90 Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Report Benchmark =
+CALCULATE([Ontario Within Benchmark], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Report Regional Median =
+CALCULATE([Regional Median Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Report Regional P90 =
+CALCULATE([Regional P90 Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Report Regional Benchmark =
+CALCULATE([Regional Within Benchmark], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Report Regional Gap =
+CALCULATE([Regional Gap vs Ontario Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+
+Trend Median Wait =
+CALCULATE([Ontario Median Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]))
+
+Trend P90 Wait =
+CALCULATE([Ontario P90 Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]))
+
+Trend Benchmark =
+CALCULATE([Ontario Within Benchmark], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]))
+
+Disease Story =
+VAR R=[Report Ontario Rate] VAR C=[Rate Change Since 2014] RETURN IF(ISBLANK(R),"No comparable rate is available for this selection.", [Selected Indicator] & ": Ontario recorded " & FORMAT(R,"#,0.0") & " per 100,000 in " & FORMAT([Selected PHO Year],"0") & ". " & IF(ISBLANK(C),"The 2014 comparison is unavailable.","The rate is " & FORMAT(ABS(C),"0.0%") & IF(C<0," lower",IF(C>0," higher"," unchanged")) & " than in 2014.") & " Recorded rates do not explain why patterns changed.")
+
+PHU Story =
+VAR R=[Report Ontario Rate] RETURN IF(ISBLANK(R),"Choose an indicator and a year with available data.", FORMAT([PHUs Above Reference],"0") & " of " & FORMAT([Report PHU Count],"0") & " PHUs with data are above the Ontario reference of " & FORMAT(R,"#,0.0") & " per 100,000 in " & FORMAT([Selected PHO Year],"0") & ". Higher recorded rates do not establish their causes. PHU boundaries follow this historical snapshot.")
+
+Access Story =
+VAR A=[Report Median Wait] VAR B=[Report P90 Wait] VAR P=[Report Benchmark] RETURN IF(ISBLANK(A),"No comparable wait-time result is available for this procedure and period.", [Selected Procedure] & ": the median wait was " & FORMAT(A,"0") & " days in April-September " & FORMAT([Selected CIHI Year],"0") & ". " & IF(ISBLANK(B),"", "The 90th percentile was " & FORMAT(B,"0") & " days. ") & IF(ISBLANK(P),"A benchmark percentage is not reported.",FORMAT(P,"0.0%") & " were treated within the procedure benchmark.") & " These describe completed procedures, not an individual patient's expected wait.")
+
+Regional Availability =
+IF(ISBLANK([Report Regional Median]),"Regional estimates are available for hip and knee replacement only, where published. Missing results are not zero.","Compare regions within the same procedure and reporting period. PHUs and CIHI health regions are different geographies.")

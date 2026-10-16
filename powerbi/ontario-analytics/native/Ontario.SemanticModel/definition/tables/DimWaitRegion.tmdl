@@ -1,0 +1,13 @@
+table DimWaitRegion
+	lineageTag: 98c0f817-c44a-4023-af03-898cb56f5726
+
+	column Region
+		dataType: string
+		lineageTag: aa0f17d3-3d23-45fe-948b-38cf3ed8fad5
+		summarizeBy: none
+		sourceColumn: Region
+
+	partition DimWaitRegion = m
+		mode: import
+		source = Table.Distinct(Table.SelectColumns(FactWaitRegion,{"Region"}))
+

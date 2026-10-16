@@ -1,0 +1,13 @@
+table DimProcedure
+	lineageTag: 1b19153e-4bed-4c21-b4fb-16a0f2053a6e
+
+	column Procedure
+		dataType: string
+		lineageTag: 2e99605f-db46-4d36-adc6-930c38d63862
+		summarizeBy: none
+		sourceColumn: Procedure
+
+	partition DimProcedure = m
+		mode: import
+		source = Table.Distinct(Table.SelectColumns(FactWaitProvince,{"Procedure"}))
+

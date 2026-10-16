@@ -1,0 +1,17 @@
+# Local source files, output data and Power BI caches must stay private.
+input/*
+!input/README.md
+data/*
+!data/README.md
+**/.pbi/
+**/__pycache__/
+*.pbix
+*.pbit
+*.xlsx
+*.xls
+*.csv
+*.pdf
+dashboard-data.json
+Dashboard-Preview.html
+Automated-Report.html
+Automated-Report.pdf

@@ -1,0 +1,32 @@
+{
+  "verified_on": "2026-10-16",
+  "desktop_available": true,
+  "native_project_opened": true,
+  "native_refresh_verified": true,
+  "final_native_pages_rendered": [
+    "Disease Overview",
+    "PHU Comparisons",
+    "Healthcare Access"
+  ],
+  "native_pbix_saved": "Ontario-Professional.pbix",
+  "tables": 11,
+  "relationships": 10,
+  "measures": 44,
+  "original_measures_preserved": 13,
+  "native_visual_objects": 38,
+  "tested_interactions": [
+    "native page tabs",
+    "comparison-year slicer recalculation",
+    "dynamic narrative recalculation",
+    "native PHU data-point cross-filter",
+    "native measure-driven provincial reference line"
+  ],
+  "limits": [
+    "Spot checks are not exhaustive validation of every filter combination.",
+    "Page navigator is a standard native Power BI object; Desktop edit mode uses Ctrl+click.",
+    "No Power BI Service publishing, live connection or scheduled refresh configured.",
+    "Real publisher data is not redistributed on GitHub."
+  ],
+  "source_comparisons_passed": true,
+  "numerical_check_record": "Retained in the private delivery; not distributed."
+}

@@ -1,0 +1,25 @@
+table DimIndicator
+	lineageTag: b731e627-f1d8-4269-9b80-8e49c891927b
+
+	column Indicator
+		dataType: string
+		lineageTag: e0d5b7d2-c90b-4817-b69f-617e00801dfd
+		summarizeBy: none
+		sourceColumn: Indicator
+
+	column Disease
+		dataType: string
+		lineageTag: f6301f76-743b-4322-9dc5-035b051d8770
+		summarizeBy: none
+		sourceColumn: Disease
+
+	column Statistic
+		dataType: string
+		lineageTag: 57bb0f60-7b10-4826-9fa6-48c0c68ea669
+		summarizeBy: none
+		sourceColumn: Statistic
+
+	partition DimIndicator = m
+		mode: import
+		source = let S = Table.Distinct(Table.SelectColumns(FactPHO,{"Indicator"})), D = Table.AddColumn(S,"Disease",each if Text.Contains([Indicator],"asthma") then "Asthma" else if Text.Contains([Indicator],"COPD") then "COPD" else if Text.Contains([Indicator],"diabetes") then "Diabetes" else if Text.Contains([Indicator],"hypertension") then "Hypertension" else error "Unknown indicator",type text), T = Table.AddColumn(D,"Statistic",each if Text.StartsWith([Indicator],"Prevalence") then "Prevalence" else "Incidence",type text) in T
+

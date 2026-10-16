@@ -1,0 +1,258 @@
+table FactPHO
+	lineageTag: 2d01c122-f48c-405d-9cc1-321ee2f8d6ef
+
+	measure 'PHU Rate' = IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactPHO[Rate]))
+		formatString: #,0.0
+		displayFolder: Disease
+		lineageTag: 182f82c8-24e2-47dc-a471-332b5e47dda3
+
+	measure 'Median PHU Rate' = IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), MEDIAN(FactPHO[Rate]))
+		formatString: #,0.0
+		displayFolder: Disease
+		lineageTag: 076fffbb-e1f9-4148-922e-086506229f9a
+
+	measure 'Ontario Rate' = IF(HASONEVALUE(DimIndicator[Indicator]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactOntario[Rate]))
+		formatString: #,0.0
+		displayFolder: Disease
+		lineageTag: fa7d8d26-c74b-4ff8-8ebc-57713102a757
+
+	measure 'PHU Gap vs Ontario' = VAR R = [PHU Rate] VAR B = [Ontario Rate] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)
+		formatString: +#,0.0;-#,0.0;0.0
+		displayFolder: Disease
+		lineageTag: 7e87c516-6f0a-4b29-9e45-ab21e62ee8b7
+
+	measure 'PHU Count' = DISTINCTCOUNT(FactPHO[Geography])
+		formatString: 0
+		displayFolder: Disease
+		lineageTag: cfef0049-aadc-4f6a-b759-4577aa26c806
+
+	measure 'Indicator Count' = DISTINCTCOUNT(FactPHO[Indicator])
+		formatString: 0
+		displayFolder: Disease
+		lineageTag: 0f831d36-4781-4c58-a232-e622be7dc188
+
+	measure 'Ontario Median Wait Days' = IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[MedianDays]))
+		formatString: 0.0
+		displayFolder: Healthcare access
+		lineageTag: ff48e625-17c5-4dc3-9687-b6f3a97392d2
+
+	measure 'Ontario P90 Wait Days' = IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitProvince[P90Days]))
+		formatString: 0.0
+		displayFolder: Healthcare access
+		lineageTag: b13a1286-58ea-48c3-a993-5aa3a2751f1d
+
+	measure 'Regional Median Wait Days' = IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[MedianDays]))
+		formatString: 0.0
+		displayFolder: Healthcare access
+		lineageTag: 5040f357-2e27-462f-be4a-6f9dbca524d5
+
+	measure 'Regional P90 Wait Days' = IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), SELECTEDVALUE(FactWaitRegion[P90Days]))
+		formatString: 0.0
+		displayFolder: Healthcare access
+		lineageTag: f54b0f96-6c03-4e77-8536-77a849b0b1e3
+
+	measure 'Ontario Within Benchmark' = IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitProvince[BenchmarkPct]),100))
+		formatString: 0.0%
+		displayFolder: Healthcare access
+		lineageTag: af3e2f64-d22c-47c8-8105-96f15ecfb8c2
+
+	measure 'Regional Within Benchmark' = IF(HASONEVALUE(DimProcedure[Procedure]) && HASONEVALUE(DimYear[Year]), DIVIDE(SELECTEDVALUE(FactWaitRegion[BenchmarkPct]),100))
+		formatString: 0.0%
+		displayFolder: Healthcare access
+		lineageTag: aacf68fc-3348-485d-8bcf-a5b8bc2a29c1
+
+	measure 'Regional Gap vs Ontario Days' = VAR R = [Regional Median Wait Days] VAR B = [Ontario Median Wait Days] RETURN IF(NOT ISBLANK(R) && NOT ISBLANK(B), R - B)
+		formatString: +0.0;-0.0;0.0
+		displayFolder: Healthcare access
+		lineageTag: 302e9e94-c866-4632-8cd6-62f042e711f7
+
+	measure 'Selected PHO Year' = SELECTEDVALUE(SelectPHOYear[Year], CALCULATE(MAX(FactPHO[Year]), REMOVEFILTERS()))
+		formatString: 0
+		displayFolder: Report experience
+		lineageTag: e97ca95f-e286-4aaa-8288-6578ff812177
+
+	measure 'Selected CIHI Year' = SELECTEDVALUE(SelectCIHIYear[Year], CALCULATE(MAX(FactWaitProvince[Year]), REMOVEFILTERS()))
+		formatString: 0
+		displayFolder: Report experience
+		lineageTag: eaddce32-a632-414c-8a6b-eae927b667e8
+
+	measure 'Selected Indicator' = SELECTEDVALUE(DimIndicator[Indicator], "Prevalence of asthma")
+		displayFolder: Report experience
+		lineageTag: 88957597-6fba-4b52-a88b-97c7e8ff0289
+
+	measure 'Selected Procedure' = SELECTEDVALUE(DimProcedure[Procedure], "Hip Replacement")
+		displayFolder: Report experience
+		lineageTag: fee25af2-92c9-4f8e-bde9-84b8d460e4f0
+
+	measure 'Report Ontario Rate' = CALCULATE([Ontario Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: 72128dd6-a018-486a-b0ea-252d51f9bf4f
+
+	measure 'Report Median PHU Rate' = CALCULATE([Median PHU Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: 7981923d-3f95-42a1-9026-2326fd3ec4ea
+
+	measure 'Report PHU Rate' = CALCULATE([PHU Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: f1ceebcc-28d8-46d4-a6a9-52c9d2fdb2f1
+
+	measure 'Report PHU Gap' = CALCULATE([PHU Gap vs Ontario], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: 8fc1de8a-d225-4a36-9c66-ce0ba8f52a10
+
+	measure 'Report PHU Count' = CALCULATE([PHU Count], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+		formatString: 0
+		displayFolder: Report experience
+		lineageTag: 3dd5d78c-9d91-479a-ba35-5e7fd5095eb5
+
+	measure 'Trend Ontario Rate' = CALCULATE([Ontario Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]))
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: fb916e4f-2aa7-439f-8004-04fa1de70358
+
+	measure 'Trend PHU Median' = CALCULATE([Median PHU Rate], TREATAS({[Selected Indicator]}, DimIndicator[Indicator]))
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: 83c3c01a-bfa3-418a-a6a3-d4a5399a1dce
+
+	measure 'Ontario Rate 2014' = CALCULATE([Ontario Rate], TREATAS({[Selected Indicator]},DimIndicator[Indicator]), REMOVEFILTERS(DimYear), DimYear[Year]=2014)
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: 15b7a077-9062-433b-a94b-eefe39504f27
+
+	measure 'Rate Change Since 2014' = VAR A=[Ontario Rate 2014] VAR B=[Report Ontario Rate] RETURN IF(NOT ISBLANK(A) && NOT ISBLANK(B), DIVIDE(B-A,A))
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: Report experience
+		lineageTag: 0352127a-dccb-4a4d-95d9-e579f2dbe63b
+
+	measure 'PHU Reference Rate' = [Report Ontario Rate]
+		formatString: #,0.0
+		displayFolder: Report experience
+		lineageTag: a526c331-9d78-4300-b229-1a3cc0cb6368
+
+	measure 'PHU Rank' = IF(NOT ISBLANK([Report PHU Rate]), RANKX(ALLSELECTED(DimPHU[Geography]), [Report PHU Rate],, DESC,Dense))
+		formatString: 0
+		displayFolder: Report experience
+		lineageTag: 6badf78c-52f3-4cd5-be61-7833cf9734eb
+
+	measure 'PHUs Above Reference' = VAR Ref=[Report Ontario Rate] RETURN IF(NOT ISBLANK(Ref), COUNTROWS(FILTER(ALLSELECTED(DimPHU[Geography]),NOT ISBLANK([Report PHU Rate]) && [Report PHU Rate]>Ref)))
+		formatString: 0
+		displayFolder: Report experience
+		lineageTag: 3a3cce05-4d9e-4b76-a17a-6deabf2e7552
+
+	measure 'PHU Rate CI' = CALCULATE(SELECTEDVALUE(FactPHO[ConfidenceInterval]), TREATAS({[Selected Indicator]},DimIndicator[Indicator]), TREATAS({[Selected PHO Year]},DimYear[Year]))
+		displayFolder: Report experience
+		lineageTag: 01423e52-ad89-4299-8c88-f35df07599a5
+
+	measure 'Report Median Wait' = CALCULATE([Ontario Median Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: 0.0
+		displayFolder: Report experience
+		lineageTag: 53f4b238-b268-4924-8e27-144479282658
+
+	measure 'Report P90 Wait' = CALCULATE([Ontario P90 Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: 0.0
+		displayFolder: Report experience
+		lineageTag: 85921c67-38bc-4f53-a40b-0f453a671b44
+
+	measure 'Report Benchmark' = CALCULATE([Ontario Within Benchmark], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: 0.0%
+		displayFolder: Report experience
+		lineageTag: 58148380-c3ac-4f38-8068-cf12a4c0df75
+
+	measure 'Report Regional Median' = CALCULATE([Regional Median Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: 0.0
+		displayFolder: Report experience
+		lineageTag: 13a47599-49ba-4df8-9c3a-dd2304f18070
+
+	measure 'Report Regional P90' = CALCULATE([Regional P90 Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: 0.0
+		displayFolder: Report experience
+		lineageTag: e5edbca2-a0ad-468f-a1a5-965b92c3445c
+
+	measure 'Report Regional Benchmark' = CALCULATE([Regional Within Benchmark], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: 0.0%
+		displayFolder: Report experience
+		lineageTag: 81c9ce8e-804d-4c46-a707-47cd77444fae
+
+	measure 'Report Regional Gap' = CALCULATE([Regional Gap vs Ontario Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]), TREATAS({[Selected CIHI Year]},DimYear[Year]))
+		formatString: +0.0;-0.0;0.0
+		displayFolder: Report experience
+		lineageTag: 90087b83-bbab-43c7-85a7-f8745e65d113
+
+	measure 'Trend Median Wait' = CALCULATE([Ontario Median Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]))
+		formatString: 0.0
+		displayFolder: Report experience
+		lineageTag: 5e596fa9-20ae-420e-8c05-61651d6475a1
+
+	measure 'Trend P90 Wait' = CALCULATE([Ontario P90 Wait Days], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]))
+		formatString: 0.0
+		displayFolder: Report experience
+		lineageTag: 42be31ac-5c2f-4979-9e7e-34e57664d98c
+
+	measure 'Trend Benchmark' = CALCULATE([Ontario Within Benchmark], TREATAS({[Selected Procedure]}, DimProcedure[Procedure]))
+		formatString: 0.0%
+		displayFolder: Report experience
+		lineageTag: 924803f3-6cb8-4dbd-9fdf-6026e472c602
+
+	measure 'Disease Story' = VAR R=[Report Ontario Rate] VAR C=[Rate Change Since 2014] RETURN IF(ISBLANK(R),"No comparable rate is available for this selection.", [Selected Indicator] & ": Ontario recorded " & FORMAT(R,"#,0.0") & " per 100,000 in " & FORMAT([Selected PHO Year],"0") & ". " & IF(ISBLANK(C),"The 2014 comparison is unavailable.","The rate is " & FORMAT(ABS(C),"0.0%") & IF(C<0," lower",IF(C>0," higher"," unchanged")) & " than in 2014.") & " Recorded rates do not explain why patterns changed.")
+		displayFolder: Report experience
+		lineageTag: 6b4576bb-c0f8-4851-9158-3c5f33ca7c35
+
+	measure 'PHU Story' = VAR R=[Report Ontario Rate] RETURN IF(ISBLANK(R),"Choose an indicator and a year with available data.", FORMAT([PHUs Above Reference],"0") & " of " & FORMAT([Report PHU Count],"0") & " PHUs with data are above the Ontario reference of " & FORMAT(R,"#,0.0") & " per 100,000 in " & FORMAT([Selected PHO Year],"0") & ". Higher recorded rates do not establish their causes. PHU boundaries follow this historical snapshot.")
+		displayFolder: Report experience
+		lineageTag: 651e0cf6-0014-4ea1-b933-38de123fbf34
+
+	measure 'Access Story' = VAR A=[Report Median Wait] VAR B=[Report P90 Wait] VAR P=[Report Benchmark] RETURN IF(ISBLANK(A),"No comparable wait-time result is available for this procedure and period.", [Selected Procedure] & ": the median wait was " & FORMAT(A,"0") & " days in April-September " & FORMAT([Selected CIHI Year],"0") & ". " & IF(ISBLANK(B),"", "The 90th percentile was " & FORMAT(B,"0") & " days. ") & IF(ISBLANK(P),"A benchmark percentage is not reported.",FORMAT(P,"0.0%") & " were treated within the procedure benchmark.") & " These describe completed procedures, not an individual patient's expected wait.")
+		displayFolder: Report experience
+		lineageTag: 8a9ae5a0-3087-4861-9372-46baa655df91
+
+	measure 'Regional Availability' = IF(ISBLANK([Report Regional Median]),"Regional estimates are available for hip and knee replacement only, where published. Missing results are not zero.","Compare regions within the same procedure and reporting period. PHUs and CIHI health regions are different geographies.")
+		displayFolder: Report experience
+		lineageTag: 835e73f6-d78c-41c1-bca0-56f48e531678
+
+	column Indicator
+		dataType: string
+		lineageTag: 7353c037-2eec-4caa-8e3b-8b9d04df1d3d
+		summarizeBy: none
+		sourceColumn: Indicator
+
+	column Year
+		dataType: int64
+		lineageTag: c10b7dca-0a0f-4c7c-93a7-3c4a2dc9fbd7
+		summarizeBy: none
+		sourceColumn: Year
+
+	column Geography
+		dataType: string
+		lineageTag: e2c29aea-82bc-4caf-a0e0-87e848065175
+		summarizeBy: none
+		sourceColumn: Geography
+
+	column Rate
+		dataType: double
+		lineageTag: bbdc0fb7-d9c1-4f67-ba9e-6ea1a49aefe7
+		summarizeBy: none
+		sourceColumn: Rate
+
+	column ConfidenceInterval
+		dataType: string
+		lineageTag: d49f69f8-0fbb-4fcd-9cef-a01773ae7046
+		summarizeBy: none
+		sourceColumn: ConfidenceInterval
+
+	column SuppressionFlag
+		dataType: string
+		lineageTag: e548e1dc-eaa4-4467-95de-3b0cdcf529bf
+		summarizeBy: none
+		sourceColumn: SuppressionFlag
+
+	partition FactPHO = m
+		mode: import
+		source = let S = Table.SelectRows(SourcePHO,each [Measure]="Age-standardized rate (both sexes)" and not List.Contains({"Central East","Central West","East","North East","North West","South West","Toronto","Ontario"},[Geography])), R = Table.SelectColumns(S,{"Indicator","Year","Geography","Rate","ConfidenceInterval","SuppressionFlag"}) in R
+
+	annotation PBI_ResultType = Table
+
