@@ -9,6 +9,10 @@ This project turns historical health statistics into an editable three-page anal
 
 **Public presentation:** the three preview images and browser companion below use independently generated **synthetic data** and invented PHU/health-region labels. They demonstrate the design and interactions, not research findings or live health data. The complete real-data working packages and original previews are retained in a separate private local archive. Publisher data is not bundled with this Power BI presentation folder.
 
+## Verified native report
+
+**[Open the redesigned native Power BI source and Desktop guide](native/README.md).** On 2026-10-16, its actual sources were refreshed and all three pages rendered in Power BI Desktop; a private PBIX was saved. This current report has 38 native visual objects, eleven tables, ten relationships and 44 measures, including all thirteen original measures. The native folder is a complete source copy; publisher inputs and imported data remain private. The earlier model/report files below are retained for provenance.
+
 ## Report pages
 
 | Page | Analytical purpose | Interactions |

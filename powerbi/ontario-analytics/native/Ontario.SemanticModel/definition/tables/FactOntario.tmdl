@@ -1,0 +1,37 @@
+table FactOntario
+	lineageTag: b29dbb99-2564-466c-89d7-fb7957aa12d5
+
+	column Indicator
+		dataType: string
+		lineageTag: 09f54172-9505-41c8-9354-bbd3bf91b35b
+		summarizeBy: none
+		sourceColumn: Indicator
+
+	column Year
+		dataType: int64
+		lineageTag: f6802663-c879-47cb-9afa-0b9b86419697
+		summarizeBy: none
+		sourceColumn: Year
+
+	column Rate
+		dataType: double
+		lineageTag: 197b81aa-c791-417e-b3b6-dc5f645421e9
+		summarizeBy: none
+		sourceColumn: Rate
+
+	column ConfidenceInterval
+		dataType: string
+		lineageTag: ce48db72-726c-4985-ac94-3aefed7f52da
+		summarizeBy: none
+		sourceColumn: ConfidenceInterval
+
+	column SuppressionFlag
+		dataType: string
+		lineageTag: cdbad7a7-5e04-498f-9ddd-540c406f5307
+		summarizeBy: none
+		sourceColumn: SuppressionFlag
+
+	partition FactOntario = m
+		mode: import
+		source = let S = Table.SelectRows(SourcePHO,each [Measure]="Age-standardized rate (both sexes)" and [Geography]="Ontario"), R = Table.SelectColumns(S,{"Indicator","Year","Rate","ConfidenceInterval","SuppressionFlag"}) in R
+

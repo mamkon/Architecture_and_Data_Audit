@@ -1,0 +1,43 @@
+expression SourceFolder = "C:\PowerBI\Ontario\input\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 0985aa50-f275-457e-90e4-46b9b78cb2fc
+
+	annotation PBI_ResultType = Text
+
+expression SourcePHO =
+		let
+		    W = Excel.Workbook(File.Contents(SourceFolder & "PHO_Chronic_Disease_Inc_Prev_Snapshot_2014_2023.xlsx"), [UseHeaders=false, DelayTypes=true, InferSheetDimensions=true]),
+		    S = W{[Item="Chron Dis Inc Prev Data",Kind="Sheet"]}[Data],
+		    H = Table.PromoteHeaders(Table.Skip(S,2),[PromoteAllScalars=true]),
+		    R = Table.RenameColumns(H,{{Table.ColumnNames(H){9},"SuppressionFlag"},{"95% Confidence Interval","ConfidenceInterval"}}),
+		    C = Table.TransformColumns(R,{{"Geography",Text.Trim,type text},{"Indicator",Text.Trim,type text},{"Year",each Int64.From(_),Int64.Type},{"Rate",each try Number.From(_) otherwise null,type nullable number},{"SuppressionFlag",each if _ = null then "" else Text.Trim(Text.From(_)),type text}}),
+		    V = Table.AddColumn(C,"ValidRate",each if [SuppressionFlag] = "" then [Rate] else null,type nullable number),
+		    D = Table.RemoveColumns(V,{"Rate"}),
+		    F = Table.RenameColumns(D,{{"ValidRate","Rate"}})
+		in F
+	lineageTag: 6bdebc58-629c-4430-b1db-4842a7d7788b
+
+expression SourceCIHI =
+		let
+		    W = Excel.Workbook(File.Contents(SourceFolder & "CIHI_Wait_Times_Priority_Procedures_2025.xlsx"),[UseHeaders=false, DelayTypes=true, InferSheetDimensions=true]),
+		    S = W{[Item="Table 1",Kind="Sheet"]}[Data],
+		    N = Table.SelectColumns(S,List.FirstN(Table.ColumnNames(S),8)),
+		    H = Table.PromoteHeaders(Table.Skip(N,1),[PromoteAllScalars=true]),
+		    C = Table.SelectColumns(H,{"Reporting level","Province","Region","Indicator","Metric","Data year","Unit of measurement","Indicator result"}),
+		    O = Table.SelectRows(C,each [Province]="Ontario"),
+		    R = Table.RenameColumns(O,{{"Reporting level","ReportingLevel"},{"Indicator","Procedure"},{"Data year","ReportingPeriod"},{"Unit of measurement","Unit"},{"Indicator result","ValueRaw"}}),
+		    T = Table.TransformColumns(R,{{"ReportingPeriod",each Text.From(_),type text},{"Metric",each Text.Lower(Text.Trim(_)),type text},{"Region",each if _="n/a" then "Ontario" else Text.Trim(_),type text}}),
+		    Y = Table.AddColumn(T,"Year",each Int64.From(Text.Start([ReportingPeriod],4)),Int64.Type),
+		    P = Table.AddColumn(Y,"PeriodType",each if Text.EndsWith([ReportingPeriod],"FY") then "Fiscal year" else if Text.EndsWith([ReportingPeriod],"Q3Q4") then "October–March" else "April–September",type text),
+		    V = Table.AddColumn(P,"Value",each try Number.From([ValueRaw]) otherwise null,type nullable number)
+		in V
+	lineageTag: 5c256144-70f5-49a5-a4a3-7f5ca01899d4
+
+expression CIHIWide =
+		let
+		    S = Table.SelectRows(SourceCIHI,each [PeriodType]="April–September"),
+		    M = Table.AddColumn(S,"MetricKey",each if [Metric]="50th percentile" then "MedianDays" else if [Metric]="90th percentile" then "P90Days" else if [Metric]="% meeting benchmark" then "BenchmarkPct" else if [Metric]="volume" then "Volume" else error "Unexpected CIHI metric",type text),
+		    C = Table.SelectColumns(M,{"ReportingLevel","Region","Procedure","Year","MetricKey","Value"}),
+		    P = Table.Pivot(C,{"MedianDays","P90Days","BenchmarkPct","Volume"},"MetricKey","Value")
+		in P
+	lineageTag: 385b66a6-0486-41ca-b5bf-4e75263fdee2
+

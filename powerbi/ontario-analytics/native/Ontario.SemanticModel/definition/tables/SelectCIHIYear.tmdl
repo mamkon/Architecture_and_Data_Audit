@@ -1,0 +1,13 @@
+table SelectCIHIYear
+	lineageTag: 86054b9e-9101-47bd-ac0c-7ac34e75cd51
+
+	column Year
+		dataType: int64
+		lineageTag: 48463234-26ee-4074-aab7-131d8e512c1f
+		summarizeBy: none
+		sourceColumn: Year
+
+	partition SelectCIHIYear = m
+		mode: import
+		source = let S = Table.Distinct(Table.SelectColumns(FactWaitProvince,{"Year"})), R = Table.Sort(S,{{"Year",Order.Descending}}) in R
+

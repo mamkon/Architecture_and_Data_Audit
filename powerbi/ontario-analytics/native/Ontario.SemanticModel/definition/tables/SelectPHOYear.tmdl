@@ -1,0 +1,13 @@
+table SelectPHOYear
+	lineageTag: 98db1802-2832-4c1d-883a-719797442b92
+
+	column Year
+		dataType: int64
+		lineageTag: 5fd68ae0-9dbf-450f-bce8-928b290f3c73
+		summarizeBy: none
+		sourceColumn: Year
+
+	partition SelectPHOYear = m
+		mode: import
+		source = let S = Table.Distinct(Table.SelectColumns(FactPHO,{"Year"})), R = Table.Sort(S,{{"Year",Order.Descending}}) in R
+

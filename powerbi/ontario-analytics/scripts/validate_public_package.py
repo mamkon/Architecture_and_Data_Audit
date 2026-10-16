@@ -48,7 +48,7 @@ for p in ROOT.rglob('*'):
     if not p.is_file():continue
     if p.suffix.lower() in {'.xlsx','.xls','.csv','.pdf','.pbix','.pbit','.zip'} or '.pbi' in p.parts or '__pycache__' in p.parts:
         bad.append(str(p.relative_to(ROOT)))
-    if p.suffix.lower() in {'.json','.md','.m','.dax','.py','.ps1','.html','.cmd','.pbip','.pbir','.bim','.pbism'}:
+    if p.suffix.lower() in {'.json','.md','.m','.dax','.py','.ps1','.html','.cmd','.pbip','.pbir','.bim','.pbism','.tmdl'}:
         text=p.read_text(encoding='utf-8')
         # Generic path/identifier guards; no private identifier values belong in source.
         forbidden=[':'+chr(92)+'Users'+chr(92),'One'+'Drive'+chr(92)]

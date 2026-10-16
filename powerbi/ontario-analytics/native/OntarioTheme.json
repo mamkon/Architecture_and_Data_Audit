@@ -1,0 +1,29 @@
+{
+  "name": "Ontario Analytics - Patient and Stakeholder View",
+  "dataColors": [
+    "#07847E",
+    "#2463EB",
+    "#D97919",
+    "#7154A1"
+  ],
+  "background": "#EEF3F8",
+  "foreground": "#18334B",
+  "tableAccent": "#07847E",
+  "textClasses": {
+    "title": {
+      "fontFace": "Segoe UI",
+      "fontSize": 15,
+      "color": "#18334B"
+    },
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 12,
+      "color": "#18334B"
+    },
+    "callout": {
+      "fontFace": "Segoe UI",
+      "fontSize": 30,
+      "color": "#102237"
+    }
+  }
+}

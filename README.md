@@ -20,7 +20,7 @@ The [project guide](powerbi/ontario-analytics/README.md) includes all three prev
 
 ## Data and publication status
 
-The new public previews and interactive companion use **synthetic demonstration values**, not PHO/CIHI observations. Real inputs, extracts, reports and original images remain in a complete private local archive pending suitable redistribution permission. See the [publication review](powerbi/ontario-analytics/docs/DATA-AND-PUBLICATION.md). The public demo is not a live API or a native Power BI export; Desktop rendering still needs verification.
+The new public previews and interactive companion use **synthetic demonstration values**, not PHO/CIHI observations. Real inputs, extracts, reports and original images remain in a complete private local archive pending suitable redistribution permission. See the [publication review](powerbi/ontario-analytics/docs/DATA-AND-PUBLICATION.md). The public demo is not a live API or a native Power BI export; The redesigned native report was refreshed and rendered in Desktop; see the [verified native guide](powerbi/ontario-analytics/native/README.md).
 
 ## Research background
 

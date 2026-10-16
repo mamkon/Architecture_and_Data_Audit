@@ -23,3 +23,4 @@ jobs:
           node-version: '22'
       - run: python scripts/validate_public_package.py
       - run: node scripts/test_demo.cjs
+      - run: python native/scripts/validate_structure.py

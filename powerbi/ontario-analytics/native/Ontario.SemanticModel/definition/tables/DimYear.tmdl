@@ -1,0 +1,13 @@
+table DimYear
+	lineageTag: b46df418-7b09-4ac7-a30f-b2e1ab4e49c1
+
+	column Year
+		dataType: int64
+		lineageTag: e860ebd2-1828-4db5-827f-85e90d2ae686
+		summarizeBy: none
+		sourceColumn: Year
+
+	partition DimYear = m
+		mode: import
+		source = let Y = List.Combine({FactPHO[Year],FactWaitProvince[Year],FactWaitRegion[Year]}), T = Table.FromList(List.Numbers(List.Min(Y),List.Max(Y)-List.Min(Y)+1),Splitter.SplitByNothing(),{"Year"}), R = Table.TransformColumnTypes(T,{{"Year",Int64.Type}}) in R
+
